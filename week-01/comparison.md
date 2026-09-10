@@ -1,10 +1,14 @@
 # Week 01 — Manual vs AI: Comparison
 
-**Name:**
-**Group:**
-**Date:**
+**Name:Mahdi Jafari**
+**Group: mon 4pm**
+**Date: 10 sep**
 
 ---
+
+## live URL
+https://markscalc-7ubj27.public.builtwithrocket.new
+
 
 ## 1. Facts
 
@@ -34,25 +38,32 @@
 
 <!-- Tech stack, UI, extra features, a pass threshold it invented, styling, etc. -->
 
--
--
+- Rocket.new added charts to the result page — I think it's very nice.
+- The AI builder also added the pass threshold, and overall the app in UI mode looks many times better than a console-based app.
 
 ## 4. What the AI got wrong or silently skipped
 
 <!-- Be concrete: input, expected, actual. -->
 
--
--
+Honestly, the AI made it with no problem I can mention here. The AI builder made the app flawlessly, and it passes all 4 tests with not a single problem.
+
+- It would be nice if I could have a history.
+- For some numbers it would be better if they were in decimal.
+- Overall, I think it's 95 percent correct.
 
 ## 5. The defect I asked Rocket to fix
 
 **Prompt I used:**
 
+> please add a remove button on top of scores so that i can erase all and input new records instead of one by one changing the records
+
 **Result:** (fixed / partly fixed / broke something else)
+
+Fixed and accurate.
 
 **What this tells me:**
 
----
+This tells me that AI will need some UI and overall guidance to make production-ready apps, and is not able to finish what is in my mind 100 percent.
 
 ## 6. Reflection (200–300 words)
 
@@ -64,3 +75,11 @@ Answer all four, in your own words:
 4. What must a human engineer still be responsible for after this experiment?
 
 <!-- Write your reflection below this line -->
+
+1. **What AI sped up.** The rocket.new built the whole working app — UI, input, statistics, charts — in a few minutes. It also saved time on styling and layout, which I would have skipped entirely in a console app.
+
+2. **Where AI cost me time.** The first attempt was refused, so I had to answer its questions before anything was built.
+
+3. **Which artefact I'd put my name on.** The manual solution. I wrote every line, I can explain all of it. The Rocket app looks nicer, but I dont understan the code.
+
+4. **What a human is still responsible for.** Defining the requirements (I rewrote the prompt for the AI), checking the output, and testing the app against edge cases. Also, the app should not contain security issues or inefficient use of system resources.
