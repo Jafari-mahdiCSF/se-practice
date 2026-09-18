@@ -97,24 +97,35 @@ no external libraries. Return code plus a short explanation.
 
 ```
 
+Example: analyze_marks([40, 60, 80], 50) → average 60, highest 80, lowest 40,
+pass_rate 66.67. Include tests for: one mark, decimals, custom pass_mark, empty list,
+text value, and marks below 0 or above 100. State any remaining assumptions before
+the code.
 ```
 
 **Tests the AI wrote for itself** — how many, and which situations do they cover?
 
 | Situation | Covered by the AI's tests? |
 | --- | --- |
-| one mark | |
-| decimals | |
-| custom pass_mark | |
-| empty list | |
-| text value | |
-| below 0 / above 100 | |
+| one mark | yes |
+| decimals | yes |
+| custom pass_mark | yes |
+| empty list | yes |
+| text value | yes |
+| below 0 / above 100 | yes |
 
-**Do the AI's own tests pass against the AI's own code?** yes / no
+**Do the AI's own tests pass against the AI's own code?** yes
 
-**Do they agree with the harness in section 6?** yes / no — if no, where do they disagree:
+**Do they agree with the harness in section 6?** no — if no, where do they disagree:
+The AI's tests cover the same general categories, but they do not match the exact six harness cases. They do not test the exact required values for the case `[49.5, 50]`, and they do not check the exact mixed-type and range failures required by the lab harness.
 
 **Assumptions C stated explicitly before the code:**
+- Empty input raises `ValueError`.
+- Marks must be numeric (`int` or `float`), and `bool` is rejected.
+- Each mark must be within `0` to `100`.
+- `pass_mark` itself must be numeric and within `0` to `100`.
+- `pass_rate` is a percentage from `0` to `100`, rounded to 2 decimals.
+- `average` is rounded to 2 decimals; `highest` and `lowest` are returned as numeric values.
 
 ---
 
