@@ -1,8 +1,8 @@
 # Lab report — Practice #02: The Prompt Is an Engineering Input
 
-**Name:**
-**Group:**
-**Date:**
+**Name: Mahdi Jafari**
+**Group: MON 16-19**
+**Date: 18/SEP**
 
 > Fill in every section. **Do not delete or renumber the headings** — the grading pass reads them
 > by number. If something did not happen, write "did not happen" and why; an empty section and a
@@ -14,16 +14,17 @@
 
 | | |
 | --- | --- |
-| AI assistant | |
-| Exact model name | |
-| Implementation language | |
-| Date of the runs | |
+| AI assistant | DeepSeek |
+| Exact model name | DeepSeek-V4.1-Flash |
+| Implementation language | Python |
+| Date of the runs | 2026-09-18 |
+
 
 **Non-Python students only** — paste your substituted Prompt B text here, so the substitution can
 be checked:
 
 ```
-(paste here, or write "n/a — used Python")
+n/a
 ```
 
 **Confirmations:**
@@ -38,26 +39,32 @@ be checked:
 
 **Prompt sent** (should be exactly one sentence):
 
+Write Python code to analyze student marks.
+
 ```
 
 ```
 
 **Assumptions the AI made that I never gave it** — list them, one per line. A data format, a pass
-threshold, a rounding rule, an input method, an invented feature all count.
+threshold, an invented feature all count.
 
-1.
-2.
-3.
+1. It assumed the input is a nested dictionary of student names to subject marks, not a flat list of numbers.
+2. It assumed a pass threshold of 60 for weak students and grade bands such as A/B/C/D/F.
+3. It assumed the task should include visualizations, heatmaps, and plots, not just a numeric summary.
+4. It assumed the solution should be a class-based report generator with example data and a script entry point.
+5. It assumed a rounding and reporting style for averages and grade outputs without being told what the required output format was.
 
 **Questions it should have asked and did not:**
 
-1.
-2.
+1. What is the exact input format: a list of marks, a dict of student marks, or a dataset of subjects?
+2. What should the function return: a dictionary with exact keys such as average, highest, lowest, and pass_rate, or a larger report object?
+3. What values are valid and invalid: should empty lists, text entries, and out-of-range values raise an error instead of being ignored?
 
-**Is the function named `analyze_marks` with the required signature?** yes / no — if no, what is it
-called:
+**Is the function named `analyze_marks` with the required signature?** no — if no, what is it
+called: It is not called `analyze_marks`; it defines a class named `StudentMarksAnalyzer` and methods such as `get_student_averages()`, `identify_weak_students()`, and `generate_report()`.
 
 **First impression before testing** (one sentence — you will compare this with section 6 later):
+Prompt A was far too vague and generated a large class-based reporting system instead of the exact single-function contract the task required.
 
 ---
 
