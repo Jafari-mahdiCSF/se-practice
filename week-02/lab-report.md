@@ -39,10 +39,10 @@ n/a
 
 **Prompt sent** (should be exactly one sentence):
 
-Write Python code to analyze student marks.
+
 
 ```
-
+Write Python code to analyze student marks.
 ```
 
 **Assumptions the AI made that I never gave it** — list them, one per line. A data format, a pass
@@ -73,18 +73,21 @@ Prompt A was far too vague and generated a large class-based reporting system in
 **Prompt sent** (paste it in full, including any substitutions):
 
 ```
-
+You are a Python developer. Implement analyze_marks(marks, pass_mark=50). Return
+average, highest, lowest, and pass_rate in a dictionary. Accept marks from 0 to 100;
+raise ValueError for an empty list, non-numeric values, or out-of-range values. Use
+no external libraries. Return code plus a short explanation.
 ```
 
 **What B fixed compared to A:**
 
-1.
-2.
+1. It specified the exact function name and signature: `analyze_marks(marks, pass_mark=50)`.
+2. It defined the required output shape and validation rules: dictionary with `average`, `highest`, `lowest`, and `pass_rate`; raise `ValueError` for empty, non-numeric, or out-of-range marks.
 
 **What B still leaves open:**
 
-1.
-2.
+1. It does not say how to round decimal results or whether `pass_rate` should be `0-100` percent or `0-1` fraction.
+2. It does not define edge-case behavior for inputs like `bool`, tuples, or the exact expected test cases.
 
 ---
 

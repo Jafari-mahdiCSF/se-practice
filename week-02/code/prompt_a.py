@@ -1,6 +1,6 @@
-Here's a comprehensive Python code for analyzing student marks with various useful features:
+# Here's a comprehensive Python code for analyzing student marks with various useful features:
 
-```python
+# ```python
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -241,34 +241,34 @@ if __name__ == "__main__":
     
     print("\nStudents needing help:")
     print(analyzer.identify_weak_students(threshold=65))
-```
+# ```
 
-This code provides:
+# This code provides:
 
-## **Key Features:**
+# ## **Key Features:**
 
-1. **Basic Statistics** - Mean, median, standard deviation, min/max for each subject
-2. **Student Rankings** - Average, total, highest and lowest marks per student
-3. **Grade Distribution** - Automatic grading based on averages
-4. **Top Performers** - Best students overall and per subject
-5. **Weak Student Identification** - Students needing improvement
-6. **Correlation Analysis** - Relationship between subjects
-7. **Visualizations**:
-   - Distribution histograms
-   - Student comparison bar charts
-   - Subject heatmaps
+# 1. **Basic Statistics** - Mean, median, standard deviation, min/max for each subject
+# 2. **Student Rankings** - Average, total, highest and lowest marks per student
+# 3. **Grade Distribution** - Automatic grading based on averages
+# 4. **Top Performers** - Best students overall and per subject
+# 5. **Weak Student Identification** - Students needing improvement
+# 6. **Correlation Analysis** - Relationship between subjects
+# 7. **Visualizations**:
+#    - Distribution histograms
+#    - Student comparison bar charts
+#    - Subject heatmaps
 
-## **Usage:**
+# ## **Usage:**
 
-```python
-# Create your own data
-data = {
-    'Student1': {'Math': 85, 'Science': 90},
-    'Student2': {'Math': 78, 'Science': 82}
-}
+# ```python
+# # Create your own data
+# data = {
+#     'Student1': {'Math': 85, 'Science': 90},
+#     'Student2': {'Math': 78, 'Science': 82}
+# }
 
-analyzer = StudentMarksAnalyzer(data)
-analyzer.generate_report()
-```
+# analyzer = StudentMarksAnalyzer(data)
+# analyzer.generate_report()
+# ```
 
-The code is modular, extensible, and provides both statistical analysis and visual insights into student performance. You can easily modify grade thresholds, add more subjects, or include additional metrics as needed.
+# The code is modular, extensible, and provides both statistical analysis and visual insights into student performance. You can easily modify grade thresholds, add more subjects, or include additional metrics as needed.
