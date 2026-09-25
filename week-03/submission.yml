@@ -1,0 +1,39 @@
+schema: 1
+week: "03"
+
+student:
+  name: Mahdi Jafari
+  student_id: 24B032230
+  github: Jafari-mahdiCSF
+
+assistant:
+  tool: Copilot SDK in VS Code
+  model: GPT-6 Luna
+
+counts:
+  user_stories: 6
+  acceptance_criteria_sets: 3
+
+checker:
+  pass: 23
+  fail: 0
+  error: 0
+  commit: 05b8795
+
+assumptions:
+  overlap_touching_bookings: allowed
+  exactly_two_hours: allowed
+
+traceability:
+  use_cases_not_covered: []
+  stories_not_traced: []
+
+review_findings:
+  - "US-07 was outside the fixed scenario because it introduced SMS reminders, so it was removed rather than retained as a new function."
+  - "UC-05 was incorrectly associated with Student in the raw diagram even though Review usage belongs to Administrator."
+  - "UC-06 was incorrectly associated with Student in the raw diagram; Send confirmation is system behavior and has no person-triggered association."
+  - "AC-05 needed an explicit no-recording result for a duration boundary failure, so the final criterion states that no reservation is created."
+
+honesty:
+  can_explain_everything_submitted: yes
+  ai_usage_disclosed: yes
