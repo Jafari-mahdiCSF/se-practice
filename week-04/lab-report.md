@@ -128,7 +128,48 @@ Compare my diagrams with the requirements. Identify missing rules, inconsistent 
 ## 9. Checker output
 
 ```text
-The final checker output is recorded below after running `python tests/check_models.py`.
+Week 04 structural check - shape only, never quality
+
+UC1  PASS  Student and Administrator declared
+UC2  PASS  named system boundary: "Smart Campus booking system"
+UC3  PASS  all actors declared outside the boundary
+UC4  PASS  all scenario goals present (6 use cases)
+UC5  PASS  no actor is associated with a confirmation use case
+UC6  PASS  actor responsibilities match the scenario
+UC7  PASS  use cases are goals, not screens or components
+UC8  PASS  every include / extend / generalization carries a ' why: comment (or there are none)
+UC9  PASS  revised diagram differs from the AI's original
+CL1  PASS  Student, Room and Booking present
+CL2  PASS  Booking is associated with Student and with Room
+CL3  PASS  every association has multiplicities at both ends
+CL4  PASS  1 student / 1 room per booking, 0..* bookings per student and per room
+CL5  PASS  every inheritance / composition / aggregation carries a ' why: comment (or there are none)
+CL6  PASS  only domain concepts in the class diagram
+CL7  PASS  attributes needed by R1-R3 are present
+CL8  PASS  a note states R2 (no overlapping active bookings)
+SQ1  PASS  Student, BookingService and BookingRepository lifelines present
+SQ2  PASS  alt block with a guard on every branch (4 branches)
+SQ3  PASS  validation happens before creation
+SQ4  PASS  nothing is saved on a failure branch
+SQ5  PASS  every message is labelled
+SQ6  PASS  R1 (time range) is visible - checked or stated as a precondition
+SQ7  PASS  R3 (blocked room) is visible
+FI1  PASS  the AI's original output is kept for every diagram
+FI2  PASS  a rendered image for every diagram
+LR1  PASS  §1 setup filled (tool and model recorded)
+LR2  PASS  5 prompts pasted in §2
+LR3  PASS  3 use-case findings in §3
+LR4  PASS  §4 relationships read both ways, 2 assumption(s) declared
+LR5  PASS  2 behaviour-diagram findings in §5
+LR6  PASS  4 critique issues with a verdict
+LR7  PASS  3 change-log rows covering all three diagrams
+CS1  PASS  6 approved stories
+CS2  PASS  §7 traces R1-R4 into the diagrams
+CS3  PASS  every use case traces to an approved story
+CS4  PASS  every lifeline is a domain class or an explained design component
+
+SUMMARY pass=37 fail=0 error=0
+A FAIL you report and explain in lab-report.md §9 costs you nothing. One you hide costs the criterion.
 ```
 
 **FAILs I am keeping, and why:** none
