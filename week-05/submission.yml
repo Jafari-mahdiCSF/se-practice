@@ -23,7 +23,7 @@ checker:
   pass: 31
   fail: 1
   error: 0
-  commit: pending
+  commit: c18ed8f
   known_fails: [M2]
 
 assumptions:
