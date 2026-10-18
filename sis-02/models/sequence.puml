@@ -1,3 +1,52 @@
-' SIS #02 — your FINAL sequence diagram goes here, as PlantUML (@startuml … @enduml).
-' Start from the AI's original in models/original/sequence.puml, apply your accepted review
-' decisions, then render it to models/img/sequence.png (or .svg). README section 5.
+@startuml
+title SIS #02 - course registration (final)
+
+actor Student
+participant "CatalogView" as CatalogView
+participant "RegistrationService" as RegistrationService
+participant "CourseOffering" as CourseOffering
+participant "Enrollment" as Enrollment
+database "EnrollmentRepository" as EnrollmentRepository
+
+Student -> CatalogView : browse catalog for one semester
+CatalogView --> Student : offerings with course code, title, semester and available places
+
+Student -> CatalogView : select offering and request registration
+CatalogView -> RegistrationService : register(studentId, offeringId)
+
+note over CatalogView, RegistrationService
+  The catalog view is only a snapshot of availability and reserves no place (R1).
+end note
+
+group atomic: duplicate check, capacity recheck and creation of the Enrollment
+  RegistrationService -> EnrollmentRepository : findEnrollment(studentId, offeringId) - duplicate check
+  EnrollmentRepository --> RegistrationService : existing enrollment or none
+
+  alt already enrolled
+    RegistrationService --> CatalogView : reject with reason "already enrolled"
+    CatalogView --> Student : "already enrolled", no place taken
+  else not already enrolled
+    RegistrationService -> CourseOffering : recheck availability against the current count and capacity
+    CourseOffering --> RegistrationService : current count and capacity
+
+    alt course full
+      RegistrationService --> CatalogView : reject with reason "course full"
+      CatalogView --> Student : "course full", count unchanged
+    else places available
+      RegistrationService -> Enrollment : create Enrollment(studentId, offeringId)
+      RegistrationService -> EnrollmentRepository : save the new Enrollment
+      EnrollmentRepository --> RegistrationService : stored
+      RegistrationService -> CourseOffering : increment enrolled count
+      CourseOffering --> RegistrationService : places reduced by one
+      RegistrationService --> CatalogView : confirm registration
+      CatalogView --> Student : confirmation with the offering details
+    end
+  end
+end
+
+note over RegistrationService, EnrollmentRepository
+  Atomic operation (R2, R3, R4): the duplicate check, the capacity recheck and the creation run
+  in one transaction with the offering row locked, so two requests cannot take the last place.
+end note
+
+@enduml

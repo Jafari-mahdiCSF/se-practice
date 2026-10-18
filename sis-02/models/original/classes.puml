@@ -1,0 +1,30 @@
+@startuml
+title SIS #02 - domain model (AI draft, Prompt B)
+
+class Student {
+  studentId : String
+  fullName : String
+}
+
+class Course {
+  code : String
+  title : String
+}
+
+class CourseOffering {
+  semester : String
+  capacity : Integer
+}
+
+class Enrollment {
+  enrolledAt : Date
+}
+
+Student "1" -- "0..*" Enrollment : holds >
+Course "1" -- "0..*" CourseOffering : is offered as >
+CourseOffering "1" -- "0..*" Enrollment : receives >
+
+note "capacity is limited" as N1
+N1 .. CourseOffering
+
+@enduml
