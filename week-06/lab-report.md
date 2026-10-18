@@ -94,15 +94,24 @@ no way to set up the case). Save each final run as `evidence/final-T<n>.png`.
 
 | # | Case | What you set up and request | Expected | AC | Result on v1 | Result on final | Final screenshot |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | Touching | 11:00–12:00 | Available | AC4 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T1.png |
-| T2 | Overlap | 10:30–11:30 | Unavailable | AC4 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T2.png |
-| T3 | Blocked | 11:00–12:00, room blocked | Unavailable | AC3 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T3.png |
-| T4 | Exactly 2 hours | 12:00–14:00 | Available | AC2 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T4.png |
-| T5 | Over 2 hours | 12:00–14:01 | Unavailable | AC2 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T5.png |
-| T6 | Starts now | 09:00–09:30 (current time 09:00) | Unavailable | AC1 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T6.png |
-| T7 | Reversed times | 12:00–11:00, and the page says why | Unavailable | AC1, AC6 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T7.png |
-| T8 | Same check twice | T1, then T1 again without reloading | Available | AC5 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T8.png |
-| T9 | Narrow screen | T1 at about 375 px wide | Available | AC6 | Available / Unavailable / Not testable | Available / Unavailable / Not testable | final-T9.png |
+| T1 | Touching | 11:00–12:00 | Available | AC4 | Available | (pending) | final-T1.png |
+| T2 | Overlap | 10:30–11:30 | Unavailable | AC4 | Unavailable | (pending) | final-T2.png |
+| T3 | Blocked | 11:00–12:00, room B-214 blocked | Unavailable | AC3 | Available | (pending) | final-T3.png |
+| T4 | Exactly 2 hours | 12:00–14:00 | Available | AC2 | Available | (pending) | final-T4.png |
+| T5 | Over 2 hours | 12:00–14:01 | Unavailable | AC2 | Unavailable | (pending) | final-T5.png |
+| T6 | Starts now | 09:00–09:30 (current time 09:00) | Unavailable | AC1 | Not testable | (pending) | final-T6.png |
+| T7 | Reversed times | 12:00–11:00, and the page says why | Unavailable | AC1, AC6 | Available | (pending) | final-T7.png |
+| T8 | Same check twice | T1, then T1 again without reloading | Available | AC5 | Unavailable | (pending) | final-T8.png |
+| T9 | Narrow screen | T1 at about 375 px wide | Available | AC6 | Available | (pending) | final-T9.png |
+
+How each run was made: every case was run in real Chrome — 1280×900, and 375×812 for T9 — against
+`original/index.html`, one fresh page load per case so the sample data is always A-101 with its
+single 10:00–11:00 booking. The values were entered in the page's own fields as `HH:MM` and the
+page's own buttons were clicked; the driving was done by a Selenium script I wrote (it only fills
+fields and clicks, exactly the steps in this table), and each screenshot is an unedited capture of
+the page at the moment the decision appeared. The Expected column is the table from
+`week-06/README.md` §6 and was not touched.
+
 
 ---
 
@@ -115,8 +124,10 @@ log a justified cleanup that preserves behaviour. Save a screenshot of each as
 
 | # | Issue | Evidence: steps → expected → observed | Priority | Decision |
 | --- | --- | --- | --- | --- |
-| 1 | | | High / Medium / Low | Fix / Reject / Defer |
-| 2 | | | High / Medium / Low | Fix / Reject / Defer |
+| 1 | AC1 is not implemented: the interval is never checked for order, and the page has no way to supply the current time | Room A-101, start 12:00, end 11:00, Check. Expected (AC1: 0 ≤ start < end ≤ 1440): Unavailable, start must be before end. Observed: "Available - 12:00 to 11:00"; the page has no current-time field either, so T6 cannot be set up at all. `evidence/issue-1.png` | High | Fix |
+| 2 | The blocked room is not blocked | Choose "B-214 · Study Room" (flagged `blocked: true` in `app.js`) and check 11:00–12:00. Expected (AC3): Unavailable because the room is blocked. Observed: "Available - 11:00 to 12:00", and nothing in the room list or the result box mentions a block. `evidence/issue-2.png` | High | Fix |
+| 3 | Checking changes the booking data and the page saves bookings (AC5 and the scope) | Check 11:00–12:00 twice without reloading. Expected (AC5): Available both times and the list still shows only 10:00–11:00. Observed: the second check answers "Not available for this slot." and the list now has a second row 11:00–12:00; `localStorage["smart-campus-bookings"]` holds the added interval, and the "Book this slot" button confirms a booking, which the scope forbids. `evidence/issue-3.png` | High | Fix |
+| 4 | The decision gives no reason and the page does not fit a phone | Check 12:00–11:00: the whole answer is "Not available for this slot." — no explanation of what is wrong. Open the same page at 375 px: the document is 960 px wide, so the title, the end-time field and the bookings are cut off and the page scrolls sideways. Expected (AC6): understandable feedback and a usable narrow layout. `evidence/issue-4.png` | Medium | Fix |
 
 ---
 
