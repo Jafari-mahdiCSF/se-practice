@@ -1,0 +1,110 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #eef2f7;
+  color: #1b2430;
+}
+
+.page {
+  width: 960px;
+  margin: 32px auto;
+}
+
+h1 {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+
+.lede {
+  margin: 0 0 24px;
+  color: #52606d;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #d5dde8;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+select,
+input {
+  display: block;
+  width: 260px;
+  margin-top: 6px;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #b8c4d4;
+  border-radius: 6px;
+}
+
+.row {
+  display: flex;
+  gap: 24px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+
+button {
+  padding: 10px 18px;
+  font-size: 16px;
+  color: #ffffff;
+  background: #1f6feb;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.secondary {
+  color: #1b2430;
+  background: #e3e9f2;
+}
+
+.result {
+  padding: 14px;
+  font-size: 16px;
+  border: 1px solid #d5dde8;
+  border-radius: 6px;
+  background: #f1f5f9;
+}
+
+.result.ok {
+  background: #e7f6ec;
+  border-color: #b7e0c3;
+}
+
+.result.no {
+  background: #fdecec;
+  border-color: #f3c2c2;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+
+#bookings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#bookings li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e6ecf4;
+}

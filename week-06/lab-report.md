@@ -50,17 +50,32 @@ Use fictional sample data only. Keep the implementation simple and within one-pa
 ## 3. Task 2 — prototype v1
 
 v1 export saved in `original/` and screenshot saved as `evidence/v1.png` **before** any cleanup
-prompt: yes / no
+prompt: yes
 
-**Bolt's list of the files/components it created, pasted unedited:**
+**The builder's list of the files/components it created, pasted unedited:**
 
 ```text
-(paste here)
+Created 3 files, no build step and no dependencies:
+- index.html  - page shell: room <select>, start and end <input type="time">, "Check availability"
+                and "Book this slot" buttons, a result box and a bookings list
+- styles.css  - one white panel layout in a fixed 960 px container
+- app.js      - ROOMS (3 fictional rooms, B-214 flagged blocked: true) and SAMPLE_BOOKINGS
+                (A-101 10:00-11:00, C-305 13:00-14:00); toMinutes(), toClock(), bookingsFor(),
+                checkAvailability(), bookSlot(), renderRooms(), renderBookings();
+                bookings are read from and written to localStorage key "smart-campus-bookings"
 ```
 
 **What v1 does — one line per thing that works, or visibly does not:**
 
--
+- Works: 11:00–12:00 against the only booking 10:00–11:00 answers "Available - 11:00 to 12:00" — touching endpoints are allowed (T1).
+- Works: 10:30–11:30 answers "Not available for this slot." (T2, AC4).
+- Works: 12:00–14:00 is accepted and 12:00–14:01 is refused, so the 120-minute rule is there (T4, T5, AC2).
+- Does not work: the room list never shows or uses the `blocked` flag, so the blocked room B-214 answers "Available" (T3, AC3).
+- Does not work: 12:00–11:00 answers "Available - 12:00 to 11:00" — the interval is never checked for order (T7, AC1).
+- Does not work: there is no field for the current time and no comparison with "now" anywhere in `app.js` (T6, AC1 — not testable).
+- Does not work: the Check button appends the interval to the booking list and writes localStorage, so the second identical check answers "Not available for this slot." (T8, AC5).
+- Does not work: the layout is a fixed 960 px column, so at 375 px the title, the end-time field and the bookings are cut off and the page scrolls sideways (T9, AC6).
+- Out of scope: the "Book this slot" button and the localStorage persistence both save/confirm a booking, which the scope forbids; the checker reports "browser storage" under `original/`.
 
 **Repair prompt** (only if the first build did not run — the deck allows one, then the result is
 v1). Leave empty if you did not need it:
