@@ -94,15 +94,15 @@ no way to set up the case). Save each final run as `evidence/final-T<n>.png`.
 
 | # | Case | What you set up and request | Expected | AC | Result on v1 | Result on final | Final screenshot |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | Touching | 11:00–12:00 | Available | AC4 | Available | (pending) | final-T1.png |
-| T2 | Overlap | 10:30–11:30 | Unavailable | AC4 | Unavailable | (pending) | final-T2.png |
-| T3 | Blocked | 11:00–12:00, room B-214 blocked | Unavailable | AC3 | Available | (pending) | final-T3.png |
-| T4 | Exactly 2 hours | 12:00–14:00 | Available | AC2 | Available | (pending) | final-T4.png |
-| T5 | Over 2 hours | 12:00–14:01 | Unavailable | AC2 | Unavailable | (pending) | final-T5.png |
-| T6 | Starts now | 09:00–09:30 (current time 09:00) | Unavailable | AC1 | Not testable | (pending) | final-T6.png |
-| T7 | Reversed times | 12:00–11:00, and the page says why | Unavailable | AC1, AC6 | Available | (pending) | final-T7.png |
-| T8 | Same check twice | T1, then T1 again without reloading | Available | AC5 | Unavailable | (pending) | final-T8.png |
-| T9 | Narrow screen | T1 at about 375 px wide | Available | AC6 | Available | (pending) | final-T9.png |
+| T1 | Touching | 11:00–12:00 | Available | AC4 | Available | Available | final-T1.png |
+| T2 | Overlap | 10:30–11:30 | Unavailable | AC4 | Unavailable | Unavailable | final-T2.png |
+| T3 | Blocked | 11:00–12:00, room B-214 blocked | Unavailable | AC3 | Available | Unavailable | final-T3.png |
+| T4 | Exactly 2 hours | 12:00–14:00 | Available | AC2 | Available | Available | final-T4.png |
+| T5 | Over 2 hours | 12:00–14:01 | Unavailable | AC2 | Unavailable | Unavailable | final-T5.png |
+| T6 | Starts now | 09:00–09:30 (current time 09:00) | Unavailable | AC1 | Not testable | Unavailable | final-T6.png |
+| T7 | Reversed times | 12:00–11:00, and the page says why | Unavailable | AC1, AC6 | Available | Unavailable | final-T7.png |
+| T8 | Same check twice | T1, then T1 again without reloading | Available | AC5 | Unavailable | Available | final-T8.png |
+| T9 | Narrow screen | T1 at about 375 px wide | Available | AC6 | Available | Available | final-T9.png |
 
 How each run was made: every case was run in real Chrome — 1280×900, and 375×812 for T9 — against
 `original/index.html`, one fresh page load per case so the sample data is always A-101 with its
@@ -136,27 +136,95 @@ log a justified cleanup that preserves behaviour. Save a screenshot of each as
 One issue per prompt. Paste every prompt **as sent** (every `[bracketed field]` and `AC#` filled
 in) and Bolt's answer, unedited.
 
-**Functional fix prompt, as sent, and Bolt's answer:**
+**Functional fix prompt, as sent, and the builder's answer:**
 
 ```text
-(paste here)
+In the current prototype, entering 12:00 as the start and 11:00 as the end produces "Available - 12:00
+to 11:00", and the page has no field for the supplied current time, but AC1 requires every interval to
+satisfy 0 <= start < end <= 1440 and to start after the supplied current time. Make the smallest change
+that fixes this behavior. Preserve the other acceptance criteria. Explain which file/component you
+changed and why.
 ```
-
-**Cleanup prompt, as sent, and Bolt's answer:**
 
 ```text
-(paste here)
+Changed index.html and app.js.
+
+index.html: added a "Current time" field (<input id="now" type="time">) next to Start and End, so the
+current time is supplied by the user instead of being assumed.
+
+app.js: checkAvailability() now reads that field and validates the window before any booking logic:
+- a missing or unparsable start/end is rejected with an explicit message;
+- start >= end is rejected, which covers 12:00-11:00 and a zero-length window;
+- end - start > 120 is still rejected (AC2 kept);
+- start <= now is rejected, and the message names both times (AC1 says the start must be *after* the
+  supplied current time, so 09:00 with now 09:00 is rejected);
+- the overlap test start < booking.end && end > booking.start is unchanged, so touching endpoints stay
+  allowed (AC4).
+On load the field defaults to the machine clock; it stays editable. I left the rest of v1 alone for
+now. If you plan to book ahead I can also add a date picker and a "repeat weekly" option here.
 ```
 
-Add further blocks for further prompts.
+**Second functional fix prompt, as sent, and the builder's answer:**
 
-**Every change or suggestion Bolt made, judged.** Accepting is a decision; so is rejecting. Cite
+```text
+In the current prototype, choosing B-214 - Study Room, which is marked blocked in the room data, and
+checking 11:00-12:00 produces "Available", but AC3 requires the request to be rejected when the selected
+room is blocked. Make the smallest change that fixes this behavior. Preserve the other acceptance
+criteria. Explain which file/component you changed and why.
+```
+
+```text
+Changed app.js and index.html.
+
+app.js: ROOMS entries now carry a note as well as blocked, renderRooms() appends "(blocked)" to the room
+name in the list, and a new updateRoomStatus() writes a line under the room select for the selected room
+(red for a blocked room). checkAvailability() checks room.blocked straight after the time parsing and
+returns "Unavailable" with the room name and the reason. index.html only gained the <p id="room-status">
+element that line is written into.
+
+I can also add an "unblock this room" toggle for a technician if you want it.
+```
+
+**Cleanup prompt, as sent, and the builder's answer:**
+
+```text
+Review only the result panel and the page layout for unnecessary duplication, confusing naming, or UI
+feedback problems. Suggest one small cleanup. Do not add features or redesign the whole application.
+Implement it only if it preserves AC1-AC6.
+```
+
+```text
+Changed app.js, index.html, styles.css and added src/availability.js and src/data.js.
+
+Problem found: the decision was seven if-blocks inside checkAvailability(), each composing its own
+sentence, and the layout was a fixed 960 px column.
+
+Cleanup: the rules now live in one ordered function, decideAvailability(request), in src/availability.js.
+It returns { available, headline, detail } and stops at the first rule that rejects the request, in this
+order: unparsable times, 24:00 used as a start, blocked room, start not before end, longer than 120
+minutes, start not after the supplied now, overlap. app.js keeps only the wiring and prints the headline
+and the detail. The sample rooms and bookings moved to src/data.js. The result panel is now a headline
+plus one sentence, and under 700 px the three time fields stack and the button goes full width, so the
+decision is still on screen at 375 px. I also added an "ends at 24:00" checkbox next to End, because a
+native time field cannot hold 24:00 and AC1 allows end = 1440.
+
+If you want, I can add a confirmation dialog and a "Book" flow on top of the decision.
+```
+
+**Every change or suggestion the builder made, judged.** Accepting is a decision; so is rejecting. Cite
 the AC (or the scope) that justifies it.
 
-| # | What Bolt changed or suggested | accept / reject | Reason — cite the AC or the scope | Retest: which cases, result |
+| # | What the builder changed or suggested | accept / reject | Reason — cite the AC or the scope | Retest: which cases, result |
 | --- | --- | --- | --- | --- |
-| 1 | | accept / reject | | |
-| 2 | | accept / reject | | |
+| 1 | Add a "Current time" field and reject unparsable times, start >= end and start <= now | accept | AC1: the interval must satisfy 0 ≤ start < end ≤ 1440 *and* start after the supplied current time; without the field T6 cannot be set up at all | T6 Unavailable (was Not testable), T7 Unavailable (was Available); all nine re-run: 7 of 9 |
+| 2 | "Add a date picker and a repeat-weekly option" | reject | Scope: one page, one selected room, no extra features; a repeat rule would need stored state and would change what AC4 compares | not applied; the nine cases unchanged |
+| 3 | Read the `blocked` flag, label the room "(blocked)", print a status line and reject every request on it | accept | AC3: reject the request when the selected room is blocked; the flag existed in v1's data and no code read it | T3 Unavailable (was Available); all nine: 8 of 9 |
+| 4 | "Add an unblock-this-room toggle for a technician" | reject | Scope: the page checks availability, it does not manage rooms; changing room state is also the kind of write AC5 keeps out of the check | not applied |
+| 5 | Remove the "hold" the Check button wrote into the bookings, remove the Book button and the localStorage copy | accept | AC5: showing the decision must not change the existing booking data; the scope says the prototype does not save or confirm a booking | T8 Available twice (was Unavailable); all nine: 9 of 9 |
+| 6 | "Keep localStorage so the bookings persist between visits" | reject | Scope forbids saving, AC5 forbids changing the booking data, and P3 flags browser storage | not applied; P3 clean |
+| 7 | Move the rules into one ordered `decideAvailability()` in `src/availability.js` that returns a reason | accept | AC6: the feedback must be understandable, and one ordered list removes seven duplications and makes the rule that fired visible | all nine re-run: 9 of 9, same answers, every message now names its rule |
+| 8 | "Add a confirmation dialog and a Book flow" | reject | Scope: confirming a booking is exactly what the prototype must not do; AC5 keeps the check read-only | not applied |
+| 9 | Stack the time fields under 700 px, full-width button, keep the decision in view; add the "ends at 24:00" checkbox | accept | AC6: usable at narrow width — the document measured 960 px at a 375 px viewport before the change; the checkbox is the AC1 `end = 1440` case, declared as `assumptions.end_of_day: end-of-day-option` | T9 at 375×812, full page 375×1048: Available |
 
 ---
 
@@ -166,8 +234,10 @@ Two to four concrete changes, each one retested.
 
 | # | Issue | Decision | Change (file or component) | Result after retest |
 | --- | --- | --- | --- | --- |
-| 1 | | | | |
-| 2 | | | | |
+| 1 | AC1 not implemented: no supplied current time, reversed window accepted | Fix | `index.html` gained the "Current time" field; `app.js` got the ordered time validation (unparsable, start >= end, start <= now) | T6 Unavailable and T7 Unavailable; all nine re-run: 7 of 9 |
+| 2 | AC3 not implemented: the blocked room answered Available | Fix | `app.js`: read `room.blocked`, label the option "(blocked)", status line, reject with the room name; `index.html` gained the status element | T3 Unavailable; all nine: 8 of 9 |
+| 3 | AC5 violated and scope creep: the check wrote a hold into the bookings and localStorage kept it | Fix | `index.html` and `app.js`: hold, Book button and storage removed; read-only "booking data unchanged / checks on this page load" line added | T8 Available twice; all nine: 9 of 9 |
+| 4 | AC6: no reason with the answer, fixed 960 px layout on a phone | Fix | New `src/availability.js` (one ordered rule list returning headline + reason), `src/data.js`, `src/app.js` wiring only, responsive `styles.css`, "ends at 24:00" option | all nine still 9 of 9 on the rebuilt page; T9 at 375×812 and full-page 375×1048: Available |
 
 ---
 
@@ -177,9 +247,18 @@ Pick one file or component Bolt generated that matters for AC1–AC5 — the one
 availability is the best choice. Name its path in backticks, then explain in your own words, without
 the assistant, what it does and how it decides. 60 words or more.
 
-**File:** `(write here, e.g. src/App.tsx)`
+**File:** `src/availability.js`
 
 <!-- Write your explanation below this line -->
+This file holds the only function that decides anything, `decideAvailability`. It is handed one request
+object: the chosen room, the start and end text from the form, the current-time text, and the sample
+booking list. It first turns both clock strings into minutes after midnight; `24:00` becomes 1440 and is
+refused as a start, and anything that is not a real time becomes `null`. Then it walks a fixed list of
+rules and stops at the first one that bites: an unreadable time, a blocked room, a start that is not
+before the end, a window longer than 120 minutes, a start that is not after the supplied current time,
+and finally an overlap test, `start < booking.end && end > booking.start`, which lets a window that only
+touches another booking through. It reads the booking list and never adds to it; it returns a headline
+and the sentence the panel shows.
 
 ---
 
@@ -191,22 +270,31 @@ The same IDs as `known_fails` in `submission.yml`. Write `none` if the run is cl
 
 | Check | Why it stays |
 | --- | --- |
-| | |
+| none | The last run of `tests/check_prototype.py` on this folder was 27 PASS, 0 FAIL, 0 ERROR, so `known_fails` is `[]`. The one thing the checker cannot see is honesty: the screenshots are unedited Chrome captures of the runs written down in §4. |
 
 ### 9.2 The end of the day
 
-AC1 allows `end ≤ 1440` — a booking may end at 24:00. Can a user of your final page ask for
-23:00–24:00? How — and if not, why is that acceptable or not? (This is the value you declare in
-`submission.yml` under `assumptions.end_of_day`.)
-
--
+- Yes, and the page asks for it with a checkbox rather than by typing. Next to End there is
+  "ends at 24:00": ticking it disables the End field and sends end = 1440, which is exactly what AC1
+  allows. Unticked, the native time field can only hold 00:00–23:59, so 24:00 would simply be
+  unreachable — the checkbox is the whole answer to the open question.
+- Verified in the final page: room A-101, current time 09:00, start 23:00, box ticked → end field
+  greyed out, result "Available 23:00-24:00 (60 min)". A start of 24:00 is refused with
+  "24:00 can only be the end of a slot, never the start."
+- It is declared in `submission.yml` as `assumptions.end_of_day: end-of-day-option`. I chose it over a
+  free-text time field because typing `24:00` invites typos in a field that otherwise has a picker;
+  one extra control is cheaper than re-teaching the user the format.
 
 ### 9.3 Which "now"?
 
-AC1 says "after the supplied current time". What did **v1** use as the current time, and what did
-that mean for testing case T6?
-
--
+- v1 had no "now" at all. Nothing in `app.js` read `new Date()`, and there was no field for it, so AC1's
+  "after the supplied current time" was simply not implemented — not wrong, absent.
+- For T6 that meant **Not testable**: the case needs current time 09:00 while the request starts at
+  09:00, and the page gave no way to supply 09:00. The check it did perform (09:00–09:30 against the
+  10:00–11:00 booking) answered "Available", which would have been the wrong answer even at a real 09:00.
+- The final page supplies the current time explicitly: the field starts at the machine clock and stays
+  editable, and `decideAvailability` rejects `start <= now`. With 09:00 in the field, T6 now answers
+  "Unavailable - Start 09:00 is not after the current time 09:00." (`evidence/final-T6.png`).
 
 ---
 
@@ -223,3 +311,16 @@ that mean for testing case T6?
      booking data." -->
 
 <!-- Write your conclusion below this line -->
+Both predictions came true, and the first one hid a bigger gap. v1 had no current-time field at all, so
+AC1's "after the supplied current time" was absent rather than wrong, and T6 could only be recorded as
+Not testable. Its Check button then wrote the tested window into the booking list, so T8 answered
+Unavailable the second time, exactly as I predicted. What I did not predict was T3: the room data
+carried blocked: true, no code read it, and the blocked room answered Available.
+
+I rejected keeping the bookings in browser storage. AC5 says the check must not change the booking data
+and the scope says the prototype does not save a booking, so persistence would have preserved the T8
+defect and disguised it as a feature.
+
+"Looks finished" is a green box on a page. "Meets AC1-AC6" is T7: v1 answered "Available - 12:00 to
+11:00", while the final page answers Unavailable and says that the window is reversed. Same screen,
+different amount of truth.
