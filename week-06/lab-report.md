@@ -28,8 +28,8 @@ Fill the first three columns now; fill the last one after Task 3.
 
 | # | What I expect to go wrong | AC it concerns | Was I right? (after Task 3) |
 | --- | --- | --- | --- |
-| 1 | The page will read the machine clock and give me no field to supply "now", so a slot that starts exactly at the supplied current time (T6) can be neither set up nor rejected. | AC1 | |
-| 2 | An app builder usually adds a confirm/book step, so the check itself will add the requested interval to the booking list; the second identical check in T8 will then see a clash and answer Unavailable. | AC5 | |
+| 1 | The page will read the machine clock and give me no field to supply "now", so a slot that starts exactly at the supplied current time (T6) can be neither set up nor rejected. | AC1 | Yes. v1 had no current-time field at all and never compared a start with any "now", so T6 could only be recorded as Not testable. |
+| 2 | An app builder usually adds a confirm/book step, so the check itself will add the requested interval to the booking list; the second identical check in T8 will then see a clash and answer Unavailable. | AC5 | Yes, exactly: v1's Check button pushed a "hold" for 11:00–12:00 into the bookings and into localStorage, and the second check answered "Not available for this slot." |
 
 **The initial prompt exactly as I sent it** — the deck's prompt with AC1–AC6 pasted in place of
 `[paste AC1–AC6]`, nothing else changed:
@@ -134,7 +134,7 @@ log a justified cleanup that preserves behaviour. Save a screenshot of each as
 ## 6. Task 4 — cleanup with focused prompts
 
 One issue per prompt. Paste every prompt **as sent** (every `[bracketed field]` and `AC#` filled
-in) and Bolt's answer, unedited.
+in) and the builder's answer, unedited.
 
 **Functional fix prompt, as sent, and the builder's answer:**
 
