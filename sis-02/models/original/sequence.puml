@@ -1,0 +1,29 @@
+@startuml
+title SIS #02 - course registration (AI draft, Prompt B)
+
+actor Student
+participant "CatalogView" as CatalogView
+participant "RegistrationService" as RegistrationService
+database "EnrollmentStore" as EnrollmentStore
+
+Student -> CatalogView : browse catalog
+CatalogView --> Student : offerings with course code, title and available places
+
+Student -> CatalogView : select offering and request registration
+CatalogView -> RegistrationService : register(studentId, offeringId)
+
+RegistrationService -> EnrollmentStore : countEnrollments(offeringId)
+EnrollmentStore --> RegistrationService : current enrollment count
+
+alt count < capacity
+  RegistrationService -> EnrollmentStore : create Enrollment
+  EnrollmentStore --> RegistrationService : enrollment stored
+  RegistrationService -> EnrollmentStore : update available places
+  RegistrationService --> CatalogView : confirm registration
+  CatalogView --> Student : confirmation
+else course full
+  RegistrationService --> CatalogView : rejection - course full
+  CatalogView --> Student : course full
+end
+
+@enduml
