@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Campus - Room Availability</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="page-head">
+      <h1>Smart Campus &mdash; Room Availability</h1>
+      <p class="lede">Check one room for one window. Fictional sample data; the check never saves or
+        confirms a booking.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="check-title">
+      <h2 id="check-title">Check a slot</h2>
+
+      <div class="field">
+        <label for="room">Room</label>
+        <select id="room"></select>
+        <p id="room-status" class="hint"></p>
+      </div>
+
+      <div class="field">
+        <label for="scenario">Sample bookings (fictional, not saved)</label>
+        <select id="scenario">
+          <option value="standard" selected>One booking 10:00-11:00 (T1-T9, T11, T12)</option>
+          <option value="two">Two bookings 10:00-11:00 and 11:40-12:40 (T10)</option>
+        </select>
+      </div>
+
+      <div class="times">
+        <div class="field">
+          <label for="now">Current time</label>
+          <input id="now" type="time" />
+        </div>
+        <div class="field">
+          <label for="start">Start</label>
+          <input id="start" type="time" value="11:00" />
+        </div>
+        <div class="field">
+          <label for="end">End</label>
+          <input id="end" type="time" value="12:00" />
+          <label class="check" for="end-of-day">
+            <input id="end-of-day" type="checkbox" /> ends at 24:00
+          </label>
+        </div>
+      </div>
+
+      <button id="check" type="button">Check availability</button>
+
+      <div id="result" class="result" data-state="idle" role="status" aria-live="polite">
+        <p class="result-head">No check yet</p>
+        <p class="result-detail">Pick a room and a window, then press Check availability.</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="bookings-title">
+      <h2 id="bookings-title">Bookings for <span id="room-label"></span></h2>
+      <ul id="bookings" class="bookings"></ul>
+      <p id="data-status" class="hint"></p>
+    </section>
+  </main>
+
+  <script src="src/data.js"></script>
+  <script src="src/availability.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

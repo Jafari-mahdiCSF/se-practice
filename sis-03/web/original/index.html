@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Campus - Room Availability</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <h1>Smart Campus &mdash; Room Availability</h1>
+    <p class="lede">Check whether a room is free for the time you need. Fictional sample data.</p>
+
+    <section class="panel">
+      <label for="room">Room
+        <select id="room"></select>
+      </label>
+
+      <div class="row">
+        <label for="start">Start time
+          <input id="start" type="time" value="11:00" />
+        </label>
+        <label for="end">End time
+          <input id="end" type="time" value="12:00" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="check" type="button">Check availability</button>
+        <button id="book" type="button" class="secondary">Book this slot</button>
+      </div>
+
+      <div id="result" class="result">Pick a room and a time window, then check availability.</div>
+    </section>
+
+    <section class="panel">
+      <h2>Bookings for <span id="room-label"></span></h2>
+      <ul id="bookings"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
