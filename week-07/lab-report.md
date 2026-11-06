@@ -18,7 +18,7 @@ grader find your answers by them. You can add rows to any table, but never remov
 | Assistant that generated the tests (tool) | Grok |
 | Exact model (with its version, or `not displayed`) | grok 4.6 |
 | Where I ran the tests (Bolt terminal / my computer / Codespace) | my computer |
-| Vitest version (the `RUN  v…` line of a run) | 3.2.4 |
+| Vitest version (the `RUN  v…` line of a run) | 5.1.0 |
 | Test command | npx vitest run |
 
 ---
