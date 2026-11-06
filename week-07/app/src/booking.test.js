@@ -36,9 +36,9 @@ describe("canBook", () => {
     expect(canBook({ start: 1380, end: 1441, now, blocked, bookings })).toBe(false);
   });
 
-  test("T06 AC2: two hours", () => {
+  test("T06 AC2: exactly 120 minutes is allowed", () => {
     const { now, blocked, bookings } = fixture();
-    expect(canBook({ start: 720, end: 840, now, blocked, bookings })).toBe(false);
+    expect(canBook({ start: 720, end: 840, now, blocked, bookings })).toBe(true);
   });
 
   test("T07 AC2: over two hours", () => {
@@ -79,5 +79,22 @@ describe("canBook", () => {
   test("T14 AC4: overlap shape with no bookings", () => {
     const { now, blocked } = fixture();
     expect(canBook({ start: 630, end: 690, now, blocked, bookings: [] })).toBe(true);
+  });
+
+  test("AC5: an available request leaves bookings unchanged", () => {
+    const bookings = [{ start: 600, end: 660 }];
+    const before = JSON.stringify(bookings);
+    expect(canBook({ start: 660, end: 720, now: 540, blocked: false, bookings })).toBe(true);
+    expect(JSON.stringify(bookings)).toEqual(before);
+  });
+
+  test("X1 AC1: start one minute after now", () => {
+    const { blocked, bookings } = fixture();
+    expect(canBook({ start: 541, end: 571, now: 540, blocked, bookings })).toBe(true);
+  });
+
+  test("X2 AC4: overlaps the second of two bookings", () => {
+    const bookings = [{ start: 600, end: 660 }, { start: 700, end: 760 }];
+    expect(canBook({ start: 720, end: 780, now: 540, blocked: false, bookings })).toBe(false);
   });
 });

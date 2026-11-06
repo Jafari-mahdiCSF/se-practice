@@ -80,17 +80,48 @@ five columns.
 `Vitest`, followed by the case table from section 3:
 
 ```text
-(paste here)
+Generate tests for the existing booking function using Vitest. Use AC1–AC6 and the reviewed case table below.
+
+Import the real function used by the page. Keep its code unchanged. Use fixed time and fresh fixtures. Assert exact decisions and unchanged booking data.
+
+Return the test file, run command, and AC mapping. Flag unclear requirements. We will run the tests ourselves.
+
+Default fixture: now = 540, blocked = false, bookings = [{ start: 600, end: 660 }].
+
+T01 660–720 touching after true AC4
+T02 540–570 starts now false AC1
+T03 720–720 zero duration false AC1
+T04 750–720 reversed false AC1
+T05 1380–1441 past day end false AC1
+T06 720–840 (120 min) true AC2
+T07 720–841 (121 min) false AC2
+T08 570–600 touching before true AC4
+T09 630–690 partial overlap false AC4
+T10 570–690 contains booking false AC4
+T11 615–645 inside booking false AC4
+T12 600–660 identical false AC4
+T13 660–720, blocked = true false AC3
+T14 630–690, bookings = [] true AC4
 ```
 
 **The assistant's answer: run command, AC mapping and any unclear requirements it flagged,
 pasted unedited.** Its test file goes to `suites/first/` and is not pasted here:
 
 ```text
-(paste here)
+Run command: npx vitest run
+
+AC mapping:
+T01, T08, T09, T10, T11, T12, T14 -> AC4 overlap / touching
+T02, T03, T04, T05 -> AC1 interval and now
+T06, T07 -> AC2 duration
+T13 -> AC3 blocked room
+
+Unclear: AC2 says "longer than 120 minutes". I treated exactly 120 minutes as over the cap and set T06 to false. AC5 data preservation and extra cases were not in the fourteen-row table, so they are not in this file.
+
+The test file is returned separately.
 ```
 
-The first suite was saved to `suites/first/` **before** I changed anything in it: yes / no
+The first suite was saved to `suites/first/` **before** I changed anything in it: yes
 
 ---
 
@@ -103,8 +134,9 @@ requests* · *mocked booking function*, or your own) and the AC that decides it.
 
 | # | Test or part of the suite | What is weak or wrong | Decision: accept / revise / reject | AC or reason |
 | --- | --- | --- | --- | --- |
-| 1 | | | accept / revise / reject | |
-| 2 | | | accept / revise / reject | |
+| 1 | T06 AC2: two hours, `.toBe(false)` | expected = current output: the assistant read AC2 as rejecting exactly 120 minutes | reject | AC2 rejects only duration longer than 120; 720–840 must be true |
+| 2 | whole first suite | no AC5 comparison of bookings before and after an Available call | revise | AC5: copy the list, call an allowed request, then compare |
+| 3 | whole first suite | only the fourteen planned rows; X1 and X2 are missing | revise | own boundaries: start = now + 1 (AC1) and two existing bookings (AC4) |
 
 ---
 
@@ -117,7 +149,40 @@ The **real** terminal output of the first run of the first suite, pasted unedite
 is not a run.
 
 ```text
-(paste here)
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+ RUN  v5.1.0 C:/Users/mahdi/OneDrive/Desktop/se-practice-remote-check/week-07/app
+
+ ❯ src/booking.test.js (14 tests | 1 failed) 10ms
+   ❯ canBook (14)
+     × T06 AC2: two hours 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.js > canBook > T06 AC2: two hours
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/booking.test.js:41:71
+     39|   test("T06 AC2: two hours", () => {
+     40|     const { now, blocked, bookings } = fixture();
+     41|     expect(canBook({ start: 720, end: 840, now, blocked, bookings })).…
+       |                                                                       ^
+     42|   });
+     43|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  20:28:02
+   Duration  201ms (transform 50%, import 25%, tests 17%, worker 8%)
 ```
 
 **Each failure, diagnosed** (the deck's table: import/runner error · assertion mismatch · result
@@ -125,7 +190,7 @@ changing per run · no tests discovered). Write `none` in the first row if nothi
 
 | Failing test | Observed failure | First check | Test repair or implementation fix? | Action taken |
 | --- | --- | --- | --- | --- |
-| | | | | |
+| T06 AC2: two hours | assertion mismatch: expected false, received true | compared 720–840 with AC2 | Test repair | kept canBook; changed the test to `.toBe(true)` |
 
 ### 6.2 The improvement prompt
 
@@ -133,7 +198,31 @@ The deck's improvement prompt exactly as sent, followed by the actual output fro
 paste the assistant's answer, unedited:
 
 ```text
-(paste here)
+Review this test suite against AC1–AC6 and our case table. Identify incorrect expectations, weak assertions, duplicated cases, and missing boundaries.
+
+For each proposed change, explain the requirement and the defect it could detect. Improve the tests without changing correct expectations to match buggy behavior.
+
+Use the actual failure output below. Separate test repairs from implementation fixes.
+
+ RUN  v5.1.0 C:/Users/mahdi/OneDrive/Desktop/se-practice-remote-check/week-07/app
+
+ ❯ src/booking.test.js (14 tests | 1 failed) 10ms
+   ❯ canBook (14)
+     × T06 AC2: two hours 5ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+```
+
+```text
+T06 is a test repair, not an implementation fix. AC2 rejects duration longer than 120 minutes, so 720–840 must stay true. Changing canBook to `>= 120` would hide M1.
+
+Missing AC5: call an Available request (660–720) and compare bookings with JSON.stringify of a copy taken before. That would detect a check that pushed onto the list.
+
+Missing X1: start 541 with now 540 should be true (AC1 other side of T02).
+Missing X2: 720–780 against [{600,660},{700,760}] should be false (AC4, second booking).
+
+Keep every other T01–T14 expectation. Do not mock canBook. Do not use Date.now.
 ```
 
 ### 6.3 The final run
@@ -143,7 +232,15 @@ change and after restoring the correct code from section 7. Every test must pass
 is still open, leave its test failing and explain it in 9.1.
 
 ```text
-(paste here)
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+ RUN  v5.1.0 C:/Users/mahdi/OneDrive/Desktop/se-practice-remote-check/week-07/app
+
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  20:29:42
+   Duration  164ms (import 41%, transform 28%, tests 16%, worker 13%, environment 1%)
 ```
 
 ---
@@ -156,18 +253,57 @@ error does not count as detection.
 
 | Trial | Intentional change | Detected / Survived | Failing test ID(s) | If it survived: why, and what you added |
 | --- | --- | --- | --- | --- |
-| M1 | Reject duration >= 120 instead of > 120 | Detected / Survived | | |
-| M2 | Treat touching endpoints as an overlap | Detected / Survived | | |
-| M3 | Remove the blocked-room rejection | Detected / Survived | | |
+| M1 | Reject duration >= 120 instead of > 120 | Detected | T06 | |
+| M2 | Treat touching endpoints as an overlap | Detected | T01, T08, AC5 | |
+| M3 | Remove the blocked-room rejection | Detected | T13 | |
 
 **The run of each mutant, pasted unedited.** Paste the `Tests` summary line and the failing test
 names at least:
 
 ```text
-(paste here)
+M1 — duration >= 120:
+
+ RUN  v5.1.0 C:/Users/mahdi/OneDrive/Desktop/se-practice-remote-check/week-07/app
+
+ ❯ src/booking.test.js (17 tests | 1 failed) 11ms
+   ❯ canBook (17)
+     × T06 AC2: exactly 120 minutes is allowed 6ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  20:28:57
+   Duration  191ms (transform 40%, import 28%, tests 22%, worker 9%, environment 1%)
+
+M2 — touching as overlap:
+
+ RUN  v5.1.0 C:/Users/mahdi/OneDrive/Desktop/se-practice-remote-check/week-07/app
+
+ ❯ src/booking.test.js (17 tests | 3 failed) 13ms
+   ❯ canBook (17)
+     × T01 AC4: touching after the existing booking 8ms
+     × T08 AC4: touching before the existing booking 1ms
+     × AC5: an available request leaves bookings unchanged 1ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 14 passed (17)
+   Start at  20:29:12
+   Duration  200ms (transform 39%, import 28%, tests 24%, worker 8%)
+
+M3 — no blocked check:
+
+ RUN  v5.1.0 C:/Users/mahdi/OneDrive/Desktop/se-practice-remote-check/week-07/app
+
+ ❯ src/booking.test.js (17 tests | 1 failed) 13ms
+   ❯ canBook (17)
+     × T13 AC3: blocked room 6ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  20:29:28
+   Duration  193ms (transform 42%, import 27%, tests 23%, worker 8%)
 ```
 
-All three changes reverted, and the full suite run again (section 6.3): yes / no
+All three changes reverted, and the full suite run again (section 6.3): yes
 
 ---
 
@@ -179,11 +315,11 @@ screenshot of each as `evidence/ui-1.png` … `evidence/ui-5.png`. Take **ui-4 a
 
 | # | Action | Expected observation | AC | What I observed | Pass / Fail / Not testable |
 | --- | --- | --- | --- | --- | --- |
-| U1 | Check 11:00–12:00, unblocked | Available, with the fixed sample booking | AC5 | | Pass / Fail / Not testable |
-| U2 | Enable blocked, then check again | Unavailable replaces the earlier result | AC3, AC5 | | Pass / Fail / Not testable |
-| U3 | Clear a required input and submit | Understandable validation feedback | AC6 | | Pass / Fail / Not testable |
-| U4 | Use a narrow (phone) width | Controls and result remain usable | AC6 | | Pass / Fail / Not testable |
-| U5 | Repeat the checks on the same data | Existing bookings remain unchanged | AC5 | | Pass / Fail / Not testable |
+| U1 | Check 11:00–12:00, unblocked | Available, with the fixed sample booking | AC5 | A-101, now 09:00, 11:00–12:00: green Available; list still 10:00–11:00 | Pass |
+| U2 | Enable blocked, then check again | Unavailable replaces the earlier result | AC3, AC5 | Switched to B-214 (blocked); Unavailable, room is blocked; list still 14:00–16:00 | Pass |
+| U3 | Clear a required input and submit | Understandable validation feedback | AC6 | Cleared Current time; message “Enter the current time as HH:MM so the check can compare with it.” | Pass |
+| U4 | Use a narrow (phone) width | Controls and result remain usable | AC6 | 375×812 portrait: fields stack, Check and Available still on screen without horizontal cut-off | Pass |
+| U5 | Repeat the checks on the same data | Existing bookings remain unchanged | AC5 | Second Check on A-101 11:00–12:00 still Available; list still one row 10:00–11:00; checks-this-load 5 | Pass |
 
 ---
 
@@ -195,17 +331,17 @@ Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run i
 
 | Check | Why it stays |
 | --- | --- |
-| | |
+| none | last checker run had no FAIL or ERROR |
 
 ### 9.2 Original and improved suites
 
 | Measure | First suite | Improved suite |
 | --- | --- | --- |
-| Executed / passed / failed | | |
-| Requirements with meaningful tests (AC IDs and gaps) | | |
-| Selected mutants detected | | |
-| Accepted / revised / rejected tests | | |
-| Remaining limitations | | |
+| Executed / passed / failed | 14 executed, 13 passed, 1 failed | 17 executed, 17 passed, 0 failed |
+| Requirements with meaningful tests (AC IDs and gaps) | AC1–AC4 on T01–T14; no AC5; no X1/X2 | AC1–AC5; X1 (now+1) and X2 (two bookings); AC6 still only UI |
+| Selected mutants detected | would miss nothing of M1 because T06 expected the mutant | M1 T06, M2 T01 T08 AC5, M3 T13, all detected |
+| Accepted / revised / rejected tests | T01–T05 and T07–T14 accepted; T06 rejected; AC5/X1/X2 missing | T06 repaired to true; AC5, X1, X2 added |
+| Remaining limitations | T06 would green-light M1 | invalid existing booking still unspecified; AC6 not in Vitest |
 
 ### 9.3 What no AC decides
 
@@ -213,19 +349,14 @@ Call your function with `bookings = [{ start: 700, end: 650 }]` (a reversed exis
 and a request of 660–720. What does it return? Does any AC say what it should return? (This is
 the value you declare in `submission.yml` under `assumptions.invalid_existing_booking`.)
 
--
+It returns true. AC4 talks about overlapping existing bookings, but it never says an existing row must itself be a valid interval. The overlap loop uses `start < booking.end && end > booking.start`. For 660–720 against 700–650 that is `660 < 650 && 720 > 700`, which is false, so the request is treated as free. I am declaring `returns-true` because that is what this `canBook` actually did when I called it, not because an AC requires it.
 
 ---
 
 ## 10. Conclusion (120–180 words)
 
-<!-- Answer all three in your own words, without the assistant:
-     (a) Which mistake in the FIRST suite would have let a wrong canBook pass, and how did you find it?
-     (b) What does your final green run prove, and what does it NOT prove? Use a mutant or a UI check.
-     (c) One testing limitation that remains.
-     Worthless: "The AI wrote good tests and they all passed."
-     Worth everything: "The first suite expected T06 (exactly 120 minutes) to be rejected. That
-     contradicts AC2, and it failed on a correct canBook. If I had changed the code to make it
-     pass, M1 would have become the real behaviour." -->
+The first suite expected T06 to fail: 720 to 840, exactly 120 minutes, was asserted false. AC2 only rejects a booking longer than 120 minutes, so that expected value was already wrong before any run. I saw it while matching each title to the plan, and the first Vitest output repeated it (expected false, received true). If I had edited canBook to reject duration greater than or equal to 120, the suite would have gone green and M1 would have been the shipped rule.
 
-<!-- Write your conclusion below this line -->
+The later run of 17 passing tests shows that this canBook matches T01 to T14, the AC5 copy check, X1 and X2 on the planned numbers. It does not show that the page is safe. U5 still needed two clicks in the browser to confirm the sample 10:00–11:00 row did not grow, and M3 failed only T13. Drop T13 and a missing blocked check would walk through.
+
+One limit stays open: a reversed existing booking `{start:700,end:650}` with request 660–720 returns true, and no AC names that result.
