@@ -29,15 +29,17 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 | | |
 | --- | --- |
-| File and function (or "inside the page component") | |
-| Its inputs | |
-| What it returned | |
-| How the page used it | |
+| File and function (or "inside the page component") | `src/availability.js`, function `decideAvailability` |
+| Its inputs | A request with room, startText, endText, nowText, and the sample bookings list |
+| What it returned | `{ available, headline, detail }` — Available or Unavailable plus a reason |
+| How the page used it | `app.js` called `decideAvailability(readRequest())` and painted the result box |
 
 **What I changed to extract `canBook`.** Say which file it now lives in, what you moved, and why
 the behaviour did not change. Also say which file of the page now calls it. 40 words or more.
 
 <!-- Write below this line -->
+
+The Boolean decision now lives in `src/booking.js` as `export function canBook({ start, end, now, blocked, bookings })`. I copied the same rules that `decideAvailability` already used: blocked first, then `start < end` inside 0–1440, start after now, duration at most 120, then a strict overlap. Clock parsing and the headline/detail strings stay in `availability.js`. That file imports `canBook` and uses its return value for Available / Unavailable, so the page still goes through `decideAvailability` in `app.js` and the messages do not change.
 
 ---
 
@@ -49,23 +51,23 @@ for every test. **The Expected column comes from AC1–AC4, never from the code.
 
 | ID | Candidate / changed input | Expected | AC | Reason (in your words) |
 | --- | --- | --- | --- | --- |
-| T01 | 660–720 (touching after) | true | AC4 | |
-| T02 | 540–570 (starts now) | false | AC1 | |
-| T03 | 720–720 (zero duration) | false | AC1 | |
-| T04 | 750–720 (reversed) | false | AC1 | |
-| T05 | 1380–1441 (past day end) | false | AC1 | |
-| T06 | 720–840 (120 minutes) | true | AC2 | |
-| T07 | 720–841 (121 minutes) | false | AC2 | |
-| T08 | 570–600 (touching before) | true | AC4 | |
-| T09 | 630–690 (partial overlap) | false | AC4 | |
-| T10 | 570–690 (contains booking) | false | AC4 | |
-| T11 | 615–645 (inside booking) | false | AC4 | |
-| T12 | 600–660 (identical interval) | false | AC4 | |
-| T13 | 660–720, blocked = true | false | AC3 | |
-| T14 | 630–690, bookings = [] | true | AC4 | |
-| AC5 | an Available request — the bookings after the call equal the bookings before | true, data unchanged | AC5 | |
-| X1 | | | | |
-| X2 | | | | |
+| T01 | 660–720 (touching after) | true | AC4 | 660 is the existing end, so the intervals only meet at a point and do not share interior time. |
+| T02 | 540–570 (starts now) | false | AC1 | Start must be strictly after now; 540 equals 540 so the window is not in the future. |
+| T03 | 720–720 (zero duration) | false | AC1 | start < end is required; a zero-length interval is not a valid window. |
+| T04 | 750–720 (reversed) | false | AC1 | End is before start, so the order 0 ≤ start < end ≤ 1440 fails. |
+| T05 | 1380–1441 (past day end) | false | AC1 | 1441 is after midnight; end must be at most 1440. |
+| T06 | 720–840 (120 minutes) | true | AC2 | Duration is exactly 120 minutes, which the limit still permits. |
+| T07 | 720–841 (121 minutes) | false | AC2 | Duration is one minute over the 120-minute cap. |
+| T08 | 570–600 (touching before) | true | AC4 | The request ends where the existing booking starts, so they only touch. |
+| T09 | 630–690 (partial overlap) | false | AC4 | 630–690 sits across 660, so it shares interior minutes with 600–660. |
+| T10 | 570–690 (contains booking) | false | AC4 | The request wraps the whole existing booking, which is still an overlap. |
+| T11 | 615–645 (inside booking) | false | AC4 | The request sits entirely inside 600–660. |
+| T12 | 600–660 (identical interval) | false | AC4 | The same interval as the existing booking is a full overlap. |
+| T13 | 660–720, blocked = true | false | AC3 | A blocked room rejects every request, even one that would otherwise touch cleanly. |
+| T14 | 630–690, bookings = [] | true | AC4 | With no existing bookings there is nothing to overlap, and the window is otherwise valid. |
+| AC5 | an Available request — the bookings after the call equal the bookings before | true, data unchanged | AC5 | An allowed check must leave the bookings array equal to a copy taken before the call. |
+| X1 | 541–571 (one minute after now) | true | AC1 | T02 rejects start equal to now; this checks the other side of that bound. |
+| X2 | 720–780, bookings [{600,660},{700,760}] | false | AC4 | T01–T14 never give two existing bookings; this one overlaps the second. |
 
 X1 and X2 are **your own two cases**: a boundary or a state that T01–T14 do not reach. Fill all
 five columns.

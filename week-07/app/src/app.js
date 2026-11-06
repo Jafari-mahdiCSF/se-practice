@@ -1,5 +1,8 @@
 /* Wiring only: read the fields, ask availability.js for the decision, render the answer. */
 
+import { ROOMS, SAMPLE_BOOKINGS } from "./data.js";
+import { decideAvailability, clockText } from "./availability.js";
+
 const roomSelect = document.getElementById("room");
 const nowInput = document.getElementById("now");
 const startInput = document.getElementById("start");

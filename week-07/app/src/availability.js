@@ -1,13 +1,13 @@
 /*
- * The one place where availability is decided (AC1-AC5).
- * decideAvailability() takes the request, walks the rules in a fixed order and returns
- * { available, headline, detail }. It never touches the page and never writes anything.
+ * Page-level messages. The Available / Unavailable boolean comes from canBook.
  */
+
+import { canBook } from "./booking.js";
 
 const MAX_BOOKING_MINUTES = 120;
 const END_OF_DAY = 1440;
 
-function parseClock(text) {
+export function parseClock(text) {
   const match = /^(\d{1,2}):(\d{2})$/.exec(String(text || "").trim());
   if (!match) {
     return null;
@@ -26,7 +26,7 @@ function parseClock(text) {
   return hours * 60 + minutes;
 }
 
-function clockText(minutes) {
+export function clockText(minutes) {
   if (minutes === END_OF_DAY) {
     return "24:00";
   }
@@ -39,7 +39,7 @@ function unavailable(detail) {
   return { available: false, headline: "Unavailable", detail: detail };
 }
 
-function decideAvailability(request) {
+export function decideAvailability(request) {
   const room = request.room;
   const start = parseClock(request.startText);
   const end = parseClock(request.endText);
@@ -60,30 +60,48 @@ function decideAvailability(request) {
   if (start === END_OF_DAY) {
     return unavailable("24:00 can only be the end of a slot, never the start.");
   }
-  if (room.blocked) {
-    return unavailable(room.name + " is blocked" + (room.note ? " (" + room.note + ")" : "") +
-      ", so no window can be booked in it.");
-  }
-  if (start >= end) {
-    return unavailable("Start " + clockText(start) + " is not before end " + clockText(end) +
-      " - that window is reversed.");
-  }
-  if (end - start > MAX_BOOKING_MINUTES) {
-    return unavailable("That window is " + (end - start) + " minutes long; the limit is " +
-      MAX_BOOKING_MINUTES + " minutes.");
-  }
-  if (start <= now) {
-    return unavailable("Start " + clockText(start) + " is not after the current time " +
-      clockText(now) + ".");
-  }
 
-  const clash = request.bookings.find(function (booking) {
-    return booking.roomId === room.id && start < booking.end && end > booking.start;
+  const roomBookings = (request.bookings || [])
+    .filter(function (booking) {
+      return booking.roomId === room.id;
+    })
+    .map(function (booking) {
+      return { start: booking.start, end: booking.end };
+    });
+
+  const allowed = canBook({
+    start: start,
+    end: end,
+    now: now,
+    blocked: room.blocked,
+    bookings: roomBookings
   });
 
-  if (clash) {
-    return unavailable("It overlaps the existing booking " + clockText(clash.start) + "-" +
-      clockText(clash.end) + " in this room.");
+  if (!allowed) {
+    if (room.blocked) {
+      return unavailable(room.name + " is blocked" + (room.note ? " (" + room.note + ")" : "") +
+        ", so no window can be booked in it.");
+    }
+    if (start >= end) {
+      return unavailable("Start " + clockText(start) + " is not before end " + clockText(end) +
+        " - that window is reversed.");
+    }
+    if (end - start > MAX_BOOKING_MINUTES) {
+      return unavailable("That window is " + (end - start) + " minutes long; the limit is " +
+        MAX_BOOKING_MINUTES + " minutes.");
+    }
+    if (start <= now) {
+      return unavailable("Start " + clockText(start) + " is not after the current time " +
+        clockText(now) + ".");
+    }
+    const clash = roomBookings.find(function (booking) {
+      return start < booking.end && end > booking.start;
+    });
+    if (clash) {
+      return unavailable("It overlaps the existing booking " + clockText(clash.start) + "-" +
+        clockText(clash.end) + " in this room.");
+    }
+    return unavailable("Unavailable.");
   }
 
   return {
