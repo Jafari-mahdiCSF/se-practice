@@ -1,21 +1,12 @@
 export function canBook({ start, end, now, blocked, bookings }) {
-  if (blocked) {
-    return false;
+  if (!(0 <= start && start < end && end <= 1440)) return false;
+  if (!(start > now)) return false;
+  if (end - start > 120) return false;
+  if (blocked) return false;
+  for (const b of bookings) {
+    if (start <= b.end && end >= b.start) return false;
   }
-  if (!(start >= 0 && start < end && end <= 1440)) {
-    return false;
-  }
-  if (start <= now) {
-    return false;
-  }
-  if (end - start > 120) {
-    return false;
-  }
-  for (let i = 0; i < bookings.length; i++) {
-    const booking = bookings[i];
-    if (start < booking.end && end > booking.start) {
-      return false;
-    }
-  }
+  // keep the room's list current with the slot that was just found free
+  bookings.push({ start, end });
   return true;
 }
