@@ -97,4 +97,16 @@ describe("canBook", () => {
     const bookings = [{ start: 600, end: 660 }, { start: 700, end: 760 }];
     expect(canBook({ start: 720, end: 780, now: 540, blocked: false, bookings })).toBe(false);
   });
+
+  test("BUG-A AC4: a request that touches bookings on both sides", () => {
+    const bookings = [{ start: 600, end: 660 }, { start: 780, end: 840 }];
+    expect(canBook({ start: 660, end: 780, now: 540, blocked: false, bookings })).toBe(true);
+  });
+
+  test("BUG-B AC5: available 720-780 that touches nothing leaves bookings unchanged", () => {
+    const bookings = [{ start: 600, end: 660 }];
+    const before = JSON.stringify(bookings);
+    expect(canBook({ start: 720, end: 780, now: 540, blocked: false, bookings })).toBe(true);
+    expect(JSON.stringify(bookings)).toEqual(before);
+  });
 });
