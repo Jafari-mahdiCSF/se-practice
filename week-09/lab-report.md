@@ -58,7 +58,7 @@ top-level `additionalProperties: false` rejects invented fields such as `room`.
 
 | Case | First run | Final run | What you changed |
 | --- | --- | --- | --- |
-| S01 | FAIL (starter) | PASS | Added the object properties and numeric/boolean constraints. |
+| S01 | PASS | PASS | No change; the permissive starter accepted this valid call. |
 | S02 | PASS | PASS | No change; an empty bookings array remains valid. |
 | S03 | FAIL | PASS | Made `end` an integer instead of an unconstrained value. |
 | S04 | FAIL | PASS | Added all five names to `required`. |
@@ -71,7 +71,7 @@ top-level `additionalProperties: false` rejects invented fields such as `room`.
 | S11 | PASS | PASS | Kept maximum 1440 inclusive. |
 | S12 | FAIL | PASS | Made each booking item an object with named fields. |
 
-The first run therefore had 9 failed S-cases: S01, S03–S10, and S12.
+The first run therefore had 9 failed S-cases: S03–S10 and S12.
 
 ## 4. Function calling — what the model wrote
 
