@@ -1,0 +1,50 @@
+# week-09/submission.yml — your declaration for this lab.
+#
+# Facts only. Every explanation goes in lab-report.md; nothing here repeats prose.
+# Fill every value. Check it before you push:
+#
+#     python tests/validate_submission.py
+#
+# The validator checks shape, never quality. A green run is the floor, not the grade.
+
+schema: 1
+week: "09"
+
+student:
+  name: Mahdi Jafari
+  student_id: 24B032230
+  github: Jafari-mahdiCSF
+
+assistant:
+  tool: Copilot SDK in VS Code
+  model: Chat GPT LUNA 5.6
+  fresh_chats: yes
+
+calls:
+  r3: asked
+  first_run_s_fails: 9
+
+checker:
+  # Numbers from YOUR last run of: python tests/check_tool.py
+  # They must add up to the number of checks it runs (30). Report them as they came out.
+  # A FAIL you report and explain in lab-report.md costs you nothing. A hidden one costs the criterion.
+  pass: 30
+  fail: 0
+  error: 0
+  commit: eb0622e
+  known_fails: []
+
+review_findings:
+  # Three or more. One line each, and each names what it is about: a case (S01-S12), a request
+  # (R1-R3), an action (A1-A8), an AC, or a field (start, end, now, blocked, bookings).
+  # Worthless:        "The model was accurate"
+  # Worth everything: "R3: the model invented now = 720 and start = 780 instead of asking"
+  - "S05: additionalProperties false rejects an invented room field"
+  - "R3: the model asked for a date and exact times instead of inventing required arguments"
+  - "A8: sending .env to an unknown MCP server risks credential exfiltration"
+
+honesty:
+  definition_written_by_me: no
+  calls_unedited: yes
+  outputs_unedited: yes
+  ai_usage_disclosed: yes
