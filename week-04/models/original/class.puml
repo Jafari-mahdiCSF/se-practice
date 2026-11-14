@@ -1,0 +1,7 @@
+@startuml
+class Student
+class Room
+class Booking
+Student "1" -- "1..*" Booking : makes
+Room "1" -- "1..*" Booking : hosts
+@enduml

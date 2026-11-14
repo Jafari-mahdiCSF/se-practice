@@ -1,0 +1,19 @@
+@startuml
+actor "Student" as Student
+actor "Administrator" as Admin
+rectangle "Smart Campus booking system" {
+  usecase "View availability" as View
+  usecase "Book room" as Book
+  usecase "Cancel booking" as Cancel
+  usecase "Block / unblock room" as Block
+  usecase "Review usage" as Usage
+  usecase "Send confirmation" as Confirm
+}
+Student --> View
+Student --> Book
+Student --> Cancel
+Student --> Confirm
+Admin --> Block
+Admin --> Usage
+Book ..> Confirm : <<include>>
+@enduml

@@ -1,0 +1,42 @@
+schema: 1
+week: "04"
+
+student:
+  name: Mahdi Jafari
+  student_id: 24B032230
+  github: Jafari-mahdiCSF
+
+assistant:
+  tool: Copilot SDK in VS Code
+  model: GPT-5 (Copilot SDK)
+
+counts:
+  behaviour_diagram: sequence
+  stories_source: reference
+  use_cases: 6
+  change_log_rows: 3
+
+checker:
+  pass: 37
+  fail: 0
+  error: 0
+  commit: 9f029ca
+  kept_fails: []
+
+assumptions:
+  overlap_touching_bookings: allowed
+  blocking_a_booked_room: keep-bookings
+
+traceability:
+  use_cases_not_traced: []
+  rules_not_shown: []
+
+review_findings:
+  - "Student to Send confirmation in the use-case diagram violated R4; the actor association was removed."
+  - "Student to Booking and Room to Booking multiplicities used 1..*; they were corrected to 0..*."
+  - "The sequence save(booking) occurred before validation; R1-R3 checks now precede persistence."
+
+honesty:
+  originals_unedited: yes
+  can_explain_everything_submitted: yes
+  ai_usage_disclosed: yes

@@ -1,0 +1,33 @@
+@startuml
+class Student {
+  +id : String
+  +name : String
+}
+
+class Room {
+  +id : String
+  +capacity : int
+  +blocked : boolean
+}
+
+class Booking {
+  +id : String
+  +start : DateTime
+  +end : DateTime
+  +status : BookingStatus
+}
+
+Student "1" -- "0..*" Booking : makes >
+Room "1" -- "0..*" Booking : hosts >
+
+note right of Booking
+  R2: active bookings for the same room
+  must not overlap. Multiplicity alone
+  cannot express this constraint.
+end note
+
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+}
+@enduml

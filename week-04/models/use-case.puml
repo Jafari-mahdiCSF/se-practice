@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+
+actor "Student" as Student
+actor "Administrator" as Admin
+
+rectangle "Smart Campus booking system" {
+  usecase "View availability" as View
+  usecase "Book room" as Book
+  usecase "Cancel booking" as Cancel
+  usecase "Block / unblock room" as Block
+  usecase "Review usage" as Usage
+  usecase "Send confirmation" as Confirm
+}
+
+Student --> View
+Student --> Book
+Student --> Cancel
+Admin --> Block
+Admin --> Usage
+
+' why: R4 - every successful booking produces a confirmation, an outcome rather than a user goal
+Book ..> Confirm : <<include>>
+@enduml
