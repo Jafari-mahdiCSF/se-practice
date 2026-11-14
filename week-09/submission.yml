@@ -17,7 +17,7 @@ student:
 
 assistant:
   tool: Copilot SDK in VS Code
-  model: not displayed
+  model: Chat GPT LUNA 5.6
   fresh_chats: yes
 
 calls:

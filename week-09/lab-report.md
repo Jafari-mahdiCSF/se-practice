@@ -11,7 +11,7 @@
 | | |
 | --- | --- |
 | Assistant (frozen for the whole lab) | Copilot SDK in VS Code |
-| Exact model (or "not displayed") | not displayed |
+| Exact model (or "not displayed") | Chat GPT LUNA 5.6 |
 | Three fresh chats for R1, R2, R3? (yes / no) | yes |
 | Python version (`python --version`) | Python 3.13.14 |
 

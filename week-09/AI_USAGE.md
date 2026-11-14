@@ -6,7 +6,7 @@ including anything an AI tool produced.
 
 | Tool | Exact model / plan | Used for | Which files it touched |
 | --- | --- | --- | --- |
-| Copilot SDK in VS Code | not displayed | Part 2 — drafted the R1, R2, and R3 replies and reviewed the fixed cases and requirements | calls/ |
+| Copilot SDK in VS Code | Chat GPT LUNA 5.6 | Part 2 — drafted the R1, R2, and R3 replies and reviewed the fixed cases and requirements | calls/ |
 
 **I wrote `tool/check_room.json` myself:** no
 The assistant drafted the schema. I checked its five exact properties, required fields, supported keywords, numeric bounds, nested booking shape, and the twelve checker cases.
